@@ -1,4 +1,4 @@
-package com.example.airplane_route.models;
+package com.example.orbitron.databaseModels;
 
 import jakarta.persistence.*;
 
@@ -13,6 +13,8 @@ public class Airport {
     private double latitude;
     private double longitude;
     private String name;
+    private String city;
+    private String IATA;
 
     public Long getId() {
         return id;
@@ -44,6 +46,22 @@ public class Airport {
 
     public void setLongitude(double longitude) {
         this.longitude = longitude;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getIata() {
+        return IATA;
+    }
+
+    public void setIata(String IATA) {
+        this.IATA = IATA;
     }
 
 }
