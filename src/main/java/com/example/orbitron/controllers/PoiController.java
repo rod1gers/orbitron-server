@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.orbitron.databaseModels.Poi;
+import com.example.orbitron.databaseModels.entities.Poi;
 import com.example.orbitron.repositories.PoiRepository;
 
 @RestController

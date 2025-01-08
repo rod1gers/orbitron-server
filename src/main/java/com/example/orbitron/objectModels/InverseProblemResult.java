@@ -1,4 +1,4 @@
-package com.example.orbitron.models;
+package com.example.orbitron.objectModels;
 
 public class InverseProblemResult {
     private final double geodesicDistance;

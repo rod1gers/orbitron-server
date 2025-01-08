@@ -1,4 +1,4 @@
-package com.example.orbitron.databaseModels;
+package com.example.orbitron.databaseModels.entities;
 
 import jakarta.persistence.*;
 import lombok.Data;
@@ -11,7 +11,7 @@ public class Flight {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    private String departureCity;
-    private String destinationCity;
+    private String departureAirport;
+    private String destinationAirport;
 
 }

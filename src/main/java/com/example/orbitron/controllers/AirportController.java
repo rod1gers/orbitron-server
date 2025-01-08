@@ -7,7 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.example.orbitron.databaseModels.Airport;
+import com.example.orbitron.databaseModels.entities.Airport;
 import com.example.orbitron.repositories.AirportRepository;
 
 @RestController

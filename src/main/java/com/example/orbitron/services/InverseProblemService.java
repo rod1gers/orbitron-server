@@ -3,7 +3,7 @@ package com.example.orbitron.services;
 import org.springframework.stereotype.Service;
 
 import com.example.orbitron.interfaces.GeodesicServiceInterface;
-import com.example.orbitron.models.InverseProblemResult;
+import com.example.orbitron.objectModels.InverseProblemResult;
 
 @Service
 public class InverseProblemService implements GeodesicServiceInterface {
@@ -18,6 +18,8 @@ public class InverseProblemService implements GeodesicServiceInterface {
         double b = WGS84_B;
         double f = WGS84_F;
 
+        double geodeticDistance, forwardAzimuth, reverseAzimuth;
+
         double phi1 = Math.toRadians(lat1);
         double phi2 = Math.toRadians(lat2);
         double lambda1 = Math.toRadians(lon1);
@@ -30,19 +32,24 @@ public class InverseProblemService implements GeodesicServiceInterface {
         double lambda = L;
         double lambdaPrev;
         double sinSigma, cosSigma, sigma;
-        double sinAlpha, cosAlpha;
+        double sinAlpha;
         double sinU1 = Math.sin(U1), sinU2 = Math.sin(U2);
         double cosU1 = Math.cos(U1), cosU2 = Math.cos(U2);
-        double sinLambda = Math.sin(lambda);
-        double cosLambda = Math.cos(lambda);
-        double sinLambdaSqrd = Math.pow(sinLambda, 2);
-        double cosLambdaSqrd = Math.pow(cosLambda, 2);
-        double cos2SigmaM;
+        double sinLambda;
+        double cosLambda;
+        double cosAlphaSqrd;
+        double cos2SigmaM = 0;
         double C;
         double tolerance = 1e-12;
         int iterationLimit = 100;
+        double uSqrd;
+        double A , B;
+        double sigmaDiff;
 
         do {
+            sinLambda = Math.sin(lambda);
+            cosLambda = Math.cos(lambda);
+
             sinSigma = Math.sqrt(Math.pow((cosU2 * sinLambda), 2) + Math.pow((cosU1 * sinU2 - sinU1 * cosU2 * cosLambda), 2));
             cosSigma = sinU1 * sinU2 + cosU1 * cosU2 * cosLambda;
             sigma = Math.atan2(sinSigma, cosSigma);
@@ -51,21 +58,44 @@ public class InverseProblemService implements GeodesicServiceInterface {
 
             sinAlpha = cosU1 * cosU2 * sinLambda / sinSigma;
 
-            cosLambdaSqrd = 1 - sinLambdaSqrd;
+            cosAlphaSqrd = 1 - sinAlpha * sinAlpha;
 
-            cos2SigmaM = cosSigma - ((2 * sinU1 * sinU2) / cosLambdaSqrd);
-            C = (f / 16) * cosLambdaSqrd * (4 + f * (4 - 3 * cosLambdaSqrd));
+            if ( cosAlphaSqrd != 0 ) {
+                cos2SigmaM = cosSigma - ((2 * sinU1 * sinU2) / cosAlphaSqrd);
+            }
+            
+            C = (f / 16) * cosAlphaSqrd * (4 + f * (4 - 3 * cosAlphaSqrd));
 
             lambdaPrev = lambda;
-            lambda = L + (1 - C) * f * sinAlpha * (sigma + C * sinSigma * (cos2SigmaM) + C * cosSigma * (-1 + 2 * Math.pow(cos2SigmaM, 2)));
+            lambda = L + (1 - C) * f * sinAlpha * (
+                sigma + C * sinSigma * (
+                    cos2SigmaM + C * cosSigma * (
+                        -1 + 2 * cos2SigmaM * cos2SigmaM
+                    )
+                )
+            );
 
-        } while (Math.abs(lambda - lambdaPrev) < tolerance && --iterationLimit > 0  );
+        } while (Math.abs(lambda - lambdaPrev) > tolerance && --iterationLimit > 0  );
 
         if (iterationLimit == 0) throw new RuntimeException("Vincenty's formula failed to converge");
 
-        // Replace the values passed coz they are just for testing
-        return new InverseProblemResult(lambda, lambdaPrev, iterationLimit);
+        uSqrd = ( cosAlphaSqrd * cosAlphaSqrd ) * (((a * a) - (b * b)) / (b * b)); 
+        A = 1 + (uSqrd / 16384) * (4096 + uSqrd * (-768 + uSqrd * (320 - 175 * uSqrd)));
+        B = (uSqrd / 1024) * (256 + uSqrd * (-128 + uSqrd * (74 - 47 * uSqrd)));
+        sigmaDiff = B * sinSigma * (
+                        cos2SigmaM + (1 / 4) * B * (
+                            cosSigma * ( -1 + 2 * (cos2SigmaM * cos2SigmaM)) - (1 / 6) * B * cos2SigmaM * (
+                                -3 + 4 * (sinSigma * sinSigma)) * (
+                                    -3 + 4 * (cos2SigmaM * cos2SigmaM)
+                                ) 
+                            ) 
+                        );
 
+        geodeticDistance = b * A * (sigma  - sigmaDiff);
+        forwardAzimuth = Math.atan2(cosU2 * sinLambda, cosU1 * sinU2 - sinU1 * cosU2 * cosLambda);
+        reverseAzimuth = Math.atan2(cosU1 * sinLambda, -sinU1 * cosU2 + cosU1 * sinU2 * cosLambda);
+
+        return new InverseProblemResult( geodeticDistance, forwardAzimuth, reverseAzimuth);
     }
 
 
