@@ -1,10 +1,10 @@
-package com.example.airplane_route;
+package com.example.orbitron;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class AirplaneRouteApplicationTests {
+class OrbitronTests {
 
 	@Test
 	void contextLoads() {
