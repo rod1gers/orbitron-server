@@ -1,5 +1,6 @@
-package com.example.airplane_route.controllers;
+package com.orbitron.controllers;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,10 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.example.airplane_route.models.Airport;
-import com.example.airplane_route.repositories.AirportRepository;
-
-import java.util.Optional;
+import com.orbitron.databaseModels.entities.Airport;
+import com.orbitron.repositories.AirportRepository;
 
 @RestController
 @RequestMapping("/api/v1/airport")
@@ -25,16 +24,30 @@ public class AirportController {
         return ResponseEntity.ok(airports);
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<List<Airport>> searchAirports(@RequestParam("query") String query) {
+        List<Airport> airports = airportRepository.findByNameContainingIgnoreCaseOrCityContainingIgnoreCase( query, query);
+        return ResponseEntity.ok(airports);
+    } 
+
     @PostMapping("/addAirport")
     public ResponseEntity<String> addAirport(@RequestBody Airport airport) {
-        Optional<Airport> existingAirport = airportRepository.findByName(airport.getName());
+        List<Airport> existingAirport = airportRepository.findByNameContainingIgnoreCase(airport.getName());
         
-        if (existingAirport.isPresent()) {
+        if (!existingAirport.isEmpty()) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Airport already exists");
         }
 
         airportRepository.save(airport);
         return ResponseEntity.ok("Airport added successfully");
     } 
+
+    @PostMapping("/addBulkAirports")
+    public ResponseEntity<String> addBulkAirports(@RequestBody Airport[] airports) {
+        List<Airport> airportList = Arrays.asList(airports);
+
+        airportRepository.saveAll(airportList);
+        return ResponseEntity.ok("Airports added successfully!");
+    }
 } 
 
