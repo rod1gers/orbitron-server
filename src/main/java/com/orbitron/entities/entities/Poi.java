@@ -1,4 +1,4 @@
-package com.orbitron.databaseModels.entities;
+package com.orbitron.entities.entities;
 
 import jakarta.persistence.*;
 import java.util.UUID;
