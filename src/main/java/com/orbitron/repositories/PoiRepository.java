@@ -6,7 +6,7 @@ import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.orbitron.databaseModels.entities.Poi;
+import com.orbitron.entities.entities.Poi;
 
 @Repository
 public interface PoiRepository extends JpaRepository<Poi, UUID > {
