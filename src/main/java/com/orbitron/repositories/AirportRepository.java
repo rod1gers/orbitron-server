@@ -5,8 +5,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import com.orbitron.databaseModels.entities.Airport;
 import com.orbitron.dto.CoordinatesDTO;
+import com.orbitron.entities.entities.Airport;
 
 import java.util.List;
 

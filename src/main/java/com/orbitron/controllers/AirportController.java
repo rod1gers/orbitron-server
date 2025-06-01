@@ -8,13 +8,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.orbitron.databaseModels.entities.Airport;
+import com.orbitron.entities.entities.Airport;
 import com.orbitron.repositories.AirportRepository;
 
 @RestController
 @RequestMapping("/api/v1/airport")
 public class AirportController {
-
     @Autowired
     private AirportRepository airportRepository;
 

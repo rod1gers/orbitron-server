@@ -4,9 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.orbitron.databaseModels.entities.Airport;
-import com.orbitron.databaseModels.entities.Flight;
 import com.orbitron.dto.CoordinatesDTO;
+import com.orbitron.entities.entities.Airport;
+import com.orbitron.entities.entities.Flight;
 import com.orbitron.objectModels.DirectProblemResult;
 import com.orbitron.objectModels.InverseProblemResult;
 import com.orbitron.repositories.AirportRepository;

@@ -1,4 +1,4 @@
-package com.orbitron.databaseModels;
+package com.orbitron.entities;
 
 import lombok.Data;
 
