@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.orbitron.dto.ThrottleMsgDTO;
 import com.orbitron.entities.entities.Engine;
 import com.orbitron.repositories.EngineRepository;
 import com.orbitron.services.EngineSimulator;
@@ -58,6 +60,11 @@ public class EngineParamController {
         engineSimulator.startSpoolUp(engineId);
 
         return ResponseEntity.ok("Spool-up started successfully");
+    }
+
+    @MessageMapping("/throttle")
+    public void handleThrottle(ThrottleMsgDTO message) {
+        // Handle the throttle lever position change
     }
 
     // Add method to set parameters

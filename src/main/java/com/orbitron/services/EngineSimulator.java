@@ -27,8 +27,8 @@ public class EngineSimulator {
             while (n1 < 100) {
                 n1 += 1;
                 n2 += 0.9;
-                egt += 2;
-                fuelFlow += 0.4;
+                egt += 200;
+                fuelFlow += 150;
 
                 EngineDTO dto = new EngineDTO(n1, n2, egt, fuelFlow);
                 messagingTemplate.convertAndSend("/topic/engine/" + engineId, dto);
