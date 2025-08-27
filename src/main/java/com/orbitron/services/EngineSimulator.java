@@ -73,6 +73,7 @@ public class EngineSimulator {
 
                 EngineDTO dto = new EngineDTO(n1, n2, egt, fuelFlow);
                 messagingTemplate.convertAndSend("/topic/engine/" + engineId, dto);
+                System.out.println(n1);
                 
                 try {
                     Thread.sleep(200);
