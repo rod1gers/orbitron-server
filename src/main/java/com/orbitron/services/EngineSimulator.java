@@ -1,5 +1,11 @@
 package com.orbitron.services;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
@@ -14,8 +20,43 @@ public class EngineSimulator {
     }
 
     // The Initial and incremental data here should be mended to fetch from
-    // The live sensor data  
+    // The live sensor data in the Engine (Octave Model)
     public void startSpoolUp(Long engineId) {
+
+        // List<String> angularVelocityLines = new ArrayList<>();
+        // try {
+        //     ProcessBuilder pb = new ProcessBuilder("omc", "runSimulation.mos");
+            
+        //     File resourcesDir = new File("src/main/resources");
+        //     if (resourcesDir.exists()) {
+        //         pb.directory(resourcesDir);
+        //     }
+            
+        //     pb.redirectErrorStream(true);
+        //     Process process = pb.start();
+
+        //     BufferedReader reader = new BufferedReader(
+        //         new InputStreamReader(process.getInputStream())
+        //     );
+
+        //     String line;
+        //     while ((line = reader.readLine()) != null) {
+        //         System.out.println(line); // Log all output
+        //         if (line.contains("engineShaft.w")) {
+        //             angularVelocityLines.add(line);
+        //             System.out.println("ω found: " + line);
+        //         }
+        //     }
+
+        //     process.waitFor();
+        //     // return angularVelocityLines; 
+
+        // } catch (Exception e) {
+        //     e.printStackTrace();
+        //     // return "Simulation failed: " + e.getMessage();
+        // }
+
+
         new Thread(() -> {
             // n1 = %
             // n2 = %
@@ -42,5 +83,8 @@ public class EngineSimulator {
         }).start();
 
     }
+
+
+    
 
 }

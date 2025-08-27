@@ -11,8 +11,6 @@ import com.orbitron.objectModels.DirectProblemResult;
 import com.orbitron.objectModels.InverseProblemResult;
 import com.orbitron.repositories.AirportRepository;
 import com.orbitron.repositories.FlightRepository;
-import com.orbitron.services.DirectProblemService;
-import com.orbitron.services.InverseProblemService;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -24,13 +22,11 @@ import java.util.*;
 public class FlightController {
     private FlightRepository flightRepository;
     private AirportRepository airportRepository;
-    private InverseProblemService inverseProblemService;
     
     @Autowired
-    public FlightController(FlightRepository flightRepository, AirportRepository airportRepository, InverseProblemService inverseProblemService) {
+    public FlightController(FlightRepository flightRepository, AirportRepository airportRepository) {
         this.flightRepository = flightRepository;
         this.airportRepository = airportRepository;
-        this.inverseProblemService = inverseProblemService;
     }
 
     @PostMapping("/saveFlight")
@@ -49,13 +45,13 @@ public class FlightController {
         double lat2 = coordinates.get(1).getLatitude();
         double lon2 = coordinates.get(1).getLongitude();
 
-        InverseProblemResult inverseProblemResult = inverseProblemService.calculateInverse(lat1, lon1, lat2, lon2);        
+        // InverseProblemResult inverseProblemResult = inverseProblemService.calculateInverse(lat1, lon1, lat2, lon2);        
 
         Map<String, Object> response = new HashMap<>();
         response.put("message", "Flight added successfully");
         response.put("departure", departure.get(0) );
         response.put("destination", destination.get(0));
-        response.put("inverseProblemResult", inverseProblemResult);
+        // response.put("inverseProblemResult", inverseProblemResult);
         
         return ResponseEntity.ok(response);
     }
@@ -67,28 +63,4 @@ public class FlightController {
     //     return ResponseEntity.ok(response);
     // }
 
-    @GetMapping("/getDistanceAndBearing")
-    public ResponseEntity<InverseProblemResult> getDistanceAndBearing(
-            @RequestParam("lat1") double lat1,
-            @RequestParam("lon1") double lon1,
-            @RequestParam("lat2") double lat2,
-            @RequestParam("lon2") double lon2
-        ) {
-        InverseProblemResult response = inverseProblemService.calculateInverse(lat1, lon1, lat2, lon2);
-        return ResponseEntity.ok(response);
-    }
-
-    @GetMapping("/testDirectProblemFormulae")
-    public ResponseEntity<List<double[]>> testDirectProblemFormulae(
-            @RequestParam("initialLatitude") double initLatitude,
-            @RequestParam("initialLongitude") double initLongitude, 
-            @RequestParam("initialBearing") double initBearing,
-            @RequestParam("totalDistance") double totalDistance,
-            @RequestParam("endLatitude") double endLatitude,
-            @RequestParam("endLongitude") double endLongitude
-        ) {
-        List<double[]> result = DirectProblemService.calculateIntermediaryPoints(initLatitude, initLongitude, initBearing, totalDistance, endLatitude, endLongitude );
-
-        return ResponseEntity.ok(result);
-    }
 }

@@ -1,5 +1,6 @@
 package com.orbitron.controllers;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.orbitron.dto.ThrottleMsgDTO;
 import com.orbitron.entities.entities.Engine;
 import com.orbitron.repositories.EngineRepository;
+import com.orbitron.services.ECUSimulator;
 import com.orbitron.services.EngineSimulator;
+import com.orbitron.services.OctaveTcpClient;
 
 @RestController
 @RequestMapping("/api/v1/engine")
@@ -25,10 +28,21 @@ public class EngineParamController {
 
     private final EngineRepository engineRepository;
     private final EngineSimulator engineSimulator;
+    private final ECUSimulator ecuSimulator;
+    private final OctaveTcpClient octaveTcpClient;
 
-    public EngineParamController(EngineSimulator engineSimulator, EngineRepository engineRepository) {
+    public EngineParamController
+    (
+        EngineSimulator engineSimulator,
+        EngineRepository engineRepository, 
+        ECUSimulator ecuSimulator,
+        OctaveTcpClient octaveTcpClient
+    ) 
+    {
         this.engineSimulator = engineSimulator;
         this.engineRepository = engineRepository;
+        this.ecuSimulator = ecuSimulator;
+        this.octaveTcpClient = octaveTcpClient;
     }
 
     
@@ -55,16 +69,30 @@ public class EngineParamController {
         }
     }
 
-    @PostMapping("/startEngine")
-    public ResponseEntity<String> startEngine(@RequestParam Long engineId) {
+    @MessageMapping("/startEngine")
+    public void startEngine(@RequestParam Long engineId) {
         engineSimulator.startSpoolUp(engineId);
 
-        return ResponseEntity.ok("Spool-up started successfully");
+        
     }
 
     @MessageMapping("/throttle")
     public void handleThrottle(ThrottleMsgDTO message) {
         // Handle the throttle lever position change
+        // Send the throttle position to the ECU 
+        int throttlePosition = message.getThrottlePosition();
+        Long engineId = Long.valueOf(message.getEngineId());
+        
+        ecuSimulator.setEngineId(engineId);
+        ecuSimulator.setThrottleTarget(throttlePosition);
+        ecuSimulator.update();
+    }
+
+    @PostMapping("/testOctave")
+    public ResponseEntity<String> contactOctave() {
+        // Send test data to octave
+        octaveTcpClient.sendDataToOctave();
+        return ResponseEntity.ok("Sent to octave");
     }
 
     // Add method to set parameters
