@@ -12,4 +12,6 @@ public class EngineDTO {
         this.egt = egt;
         this.fuelFlow = fuelFlow;
     }
+
+    
 }
