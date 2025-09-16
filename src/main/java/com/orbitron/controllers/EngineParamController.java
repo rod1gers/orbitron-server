@@ -68,11 +68,14 @@ public class EngineParamController {
         }
     }
 
-    @MessageMapping("/startEngine")
-    public void startEngine(@RequestParam Long engineId) {
-        engineSimulator.startSpoolUp(engineId);
+    // Connect to octave TCP server socket
+    @PostMapping("/connectToEngine")
+    public ResponseEntity<String> connectToEngineSim() {
 
+        octaveTcpClient.init();
         
+        return ResponseEntity.ok("Connected to Engine simulator successfully!");
+
     }
 
     @MessageMapping("/throttle")

@@ -6,10 +6,13 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.springframework.stereotype.Service;
 
 import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 
 @Service
 public class OctaveTcpClient {
@@ -20,26 +23,57 @@ public class OctaveTcpClient {
     private final String host = "localhost";
     private final int port = 5555;
 
+    private final ExecutorService executor = Executors.newSingleThreadExecutor();
+
+    private volatile boolean listening = false;
+
     private Socket socket;
     private OutputStream out;
     private BufferedReader in;
     private InputStream inputStream;
 
     @PostConstruct
-    public void init() {
+    public synchronized Socket init() {
+        // if (socket != null && socket.isConnected() && !socket.isClosed()) {
+        //     System.out.println("Already connected to Engine. Reusing socket");
+        //     return socket;
+        // }
+
         try {
             socket = new Socket(host, port);
             out = socket.getOutputStream();
             inputStream = socket.getInputStream();
             in = new BufferedReader(new InputStreamReader(inputStream));
             System.out.println("Connected to Octave at " + host + ":" + port);
+
+            if (!listening) {
+                listening = true;
+                executor.submit(this::listenToOctave);
+            }
+            
+            // String response = in.readLine();
+
+            // System.out.println("Response is: " + response);
+
+            return socket;
         } catch (IOException e) {
             throw new RuntimeException("Failed to connect to Octave", e);
         }
         
     }
 
-
+    private void listenToOctave() {
+        try {
+            String line;
+            while (listening && (line = in.readLine()) != null) {
+                System.out.println("Received from Octave: " + line);
+            }
+        } catch (IOException e) {
+            System.err.println("Error occurred while reading from Octave: " + e.getMessage());
+        } finally {
+            listening = false;
+        }
+    }
 
     // Try sending out 'Hello From Rodgers' to Octave
     public void sendDataToOctave() {
@@ -53,6 +87,23 @@ public class OctaveTcpClient {
         } catch( IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void closeConnection() {
+        try {
+            listening = false;
+            if (socket != null && !socket.isClosed()) {
+                socket.close();
+                System.out.println("Socket closed.");
+            }
+
+        } catch (IOException ignored) {}
+    }
+
+    @PreDestroy
+    public void shutdown() {
+        closeConnection();
+        executor.shutdownNow();
     }
     
 }
