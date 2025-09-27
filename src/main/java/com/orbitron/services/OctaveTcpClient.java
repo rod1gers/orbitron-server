@@ -9,7 +9,10 @@ import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+
+import com.orbitron.dto.EngineDTO;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
@@ -24,6 +27,7 @@ public class OctaveTcpClient {
     private final int port = 5555;
 
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private final EngineSimulator engineSimulator;
 
     private volatile boolean listening = false;
 
@@ -32,7 +36,10 @@ public class OctaveTcpClient {
     private BufferedReader in;
     private InputStream inputStream;
 
-    @PostConstruct
+    public OctaveTcpClient(EngineSimulator engineSimulator) {
+        this.engineSimulator = engineSimulator;
+    }
+
     public synchronized Socket init() {
         // if (socket != null && socket.isConnected() && !socket.isClosed()) {
         //     System.out.println("Already connected to Engine. Reusing socket");
@@ -40,7 +47,7 @@ public class OctaveTcpClient {
         // }
 
         try {
-            socket = new Socket(host, port);
+            socket = new Socket(host, port);            
             out = socket.getOutputStream();
             inputStream = socket.getInputStream();
             in = new BufferedReader(new InputStreamReader(inputStream));
@@ -50,6 +57,7 @@ public class OctaveTcpClient {
                 listening = true;
                 executor.submit(this::listenToOctave);
             }
+            
             
             // String response = in.readLine();
 
@@ -63,10 +71,15 @@ public class OctaveTcpClient {
     }
 
     private void listenToOctave() {
-        try {
-            String line;
-            while (listening && (line = in.readLine()) != null) {
-                System.out.println("Received from Octave: " + line);
+        try {   
+            String data;
+            while (listening && (data = in.readLine()) != null) {
+                System.out.println("Received from Octave: " + data);
+
+                // Pass the data from octave to the engine simulator for
+                // Cleaning and passing to frontend
+                engineSimulator.sendEngineDataFromOctave(1, data);
+
             }
         } catch (IOException e) {
             System.err.println("Error occurred while reading from Octave: " + e.getMessage());
@@ -75,15 +88,20 @@ public class OctaveTcpClient {
         }
     }
 
+    public void connectToEngine() {
+        // Send command to connect to engine (init method)
+        init();
+        
+    }
+
     // Try sending out 'Hello From Rodgers' to Octave
-    public void sendDataToOctave() {
+    public void sendCommandToOctaveEngine() {
+        
         try {
             out.write("second Hello from Rodgers".getBytes());
             out.flush();
             System.out.println("Message sent to octave");
 
-            String response = in.readLine();
-            System.out.println("This is the response:" + response);
         } catch( IOException e) {
             e.printStackTrace();
         }

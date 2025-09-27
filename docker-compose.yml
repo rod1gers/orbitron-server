@@ -1,0 +1,33 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ams.vultrcr.com/orbitroncontainerregistry1/orbitron:latest
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+      - octave
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/orbitron
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+
+  db:
+    image: postgres:15
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: orbitron
+
+
+  octave:
+    build:
+      context: ../JetEngine
+      dockerfile: Dockerfile.octave
+    image: ams.vultrcr.com/orbitroncontainerregistry1/octave:latest
+    ports:
+      - "5555:5555"

@@ -21,8 +21,21 @@ public class EngWebSocketController {
     @MessageMapping("/start-engine")
     public void startEngine( EngineStartRequest request) {
         System.out.println("Engine start triggered for Engine: " + request.getEngineId());
-    
-        engineSimulator.startSpoolUp(request.getEngineId());
+
+        // Call method that starts engine
+        
 
     }
+
+    @MessageMapping("/connect-engine")
+    public void connectToOctaveEngine() {
+        System.out.println("Connecting to Octave Engine");
+
+        // Call method that connects to engine
+        octaveTcpClient.connectToEngine();
+        
+
+    }
+
+    
 }
