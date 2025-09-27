@@ -90,10 +90,10 @@ public class EngineParamController {
         ecuSimulator.update();
     }
 
-    @PostMapping("/testOctave")
+    @PostMapping("/sendCommandToEngine")
     public ResponseEntity<String> contactOctave() {
         // Send test data to octave
-        octaveTcpClient.sendDataToOctave();
+        octaveTcpClient.sendCommandToOctaveEngine();
         return ResponseEntity.ok("Sent to octave");
     }
 
