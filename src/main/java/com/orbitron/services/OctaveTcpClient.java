@@ -24,10 +24,10 @@ public class OctaveTcpClient {
     // The Base Url of the hosting server for octave
     // These should be in the .env file
     private final String host = "localhost";
-    private final int port = 5555;
+    private final int port = 6000;
 
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
-    private final EngineSimulator engineSimulator;
+    private final EngineSimulatorInterface engineSimulator;
 
     private volatile boolean listening = false;
 
@@ -36,7 +36,7 @@ public class OctaveTcpClient {
     private BufferedReader in;
     private InputStream inputStream;
 
-    public OctaveTcpClient(EngineSimulator engineSimulator) {
+    public OctaveTcpClient(EngineSimulatorInterface engineSimulator) {
         this.engineSimulator = engineSimulator;
     }
 
@@ -57,7 +57,6 @@ public class OctaveTcpClient {
                 listening = true;
                 executor.submit(this::listenToOctave);
             }
-            
             
             // String response = in.readLine();
 
@@ -88,19 +87,31 @@ public class OctaveTcpClient {
         }
     }
 
-    public void connectToEngine() {
-        // Send command to connect to engine (init method)
-        init();
+    // public void connectToEngine() {
+    //     // Send command to connect to engine (init method)
+    //     init();
         
-    }
+    // }
 
     // Try sending out 'Hello From Rodgers' to Octave
-    public void sendCommandToOctaveEngine() {
-        
+    public void openStarterAirValve() {
         try {
-            out.write("second Hello from Rodgers".getBytes());
+            String command = "{\"command\": \"OPEN_STARTER_AIR_VALVE\"}\n";
+            out.write(command.getBytes());
             out.flush();
-            System.out.println("Message sent to octave");
+            System.out.println("Command Sent: " + command);
+
+        } catch( IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void startEngine() {
+        try {
+            String command = "{\"command\": \"START_ENGINE\"}\n";
+            out.write(command.getBytes());
+            out.flush();
+            System.out.println("Command Sent: " + command);
 
         } catch( IOException e) {
             e.printStackTrace();

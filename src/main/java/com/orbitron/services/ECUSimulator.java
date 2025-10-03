@@ -11,10 +11,12 @@ import lombok.Data;
 @Service
 public class ECUSimulator {
     private final SimpMessagingTemplate messagingTemplate;
+    private final OctaveTcpClient octaveTcpClient;
     private Long engineId;
 
-    public ECUSimulator(SimpMessagingTemplate messagingTemplate) {
+    public ECUSimulator(SimpMessagingTemplate messagingTemplate, OctaveTcpClient octaveTcpClient) {
         this.messagingTemplate = messagingTemplate;
+        this.octaveTcpClient = octaveTcpClient;
     }
 
     // The throttlevalues need to flow in a stream as it enters
@@ -48,7 +50,16 @@ public class ECUSimulator {
     // ON ENGINE START SWITCH
     // Open the starter air valve
     // In the engine, the starter air valve should be open
+    // Command Octave engine to open starter air valve and provide bleed air
+    public void startEngine() {
+        octaveTcpClient.startEngine();
+    }
     
+    public void openStarterAirValve() {
+        // Instruct Engine to start spool up by opening the start air valve
+        octaveTcpClient.openStarterAirValve();
+
+    }
 
     // ON THRUST LEVER
     // Calculate the thrust and power setting corresponding to the lever position

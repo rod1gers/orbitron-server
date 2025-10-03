@@ -2,40 +2,42 @@ package com.orbitron.controllers;
 
 
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Controller;
 
 import com.orbitron.objectModels.EngineStartRequest;
-import com.orbitron.services.EngineSimulator;
+import com.orbitron.services.ECUSimulator;
+import com.orbitron.services.EngineSimulatorInterface;
 import com.orbitron.services.OctaveTcpClient;
 
 @Controller
 public class EngWebSocketController {
-    private final EngineSimulator engineSimulator;
+    private final EngineSimulatorInterface engineSimulatorInterface;
     private final OctaveTcpClient octaveTcpClient;
+    private final ECUSimulator ecuSimulator;
 
-    public EngWebSocketController(EngineSimulator engineSimulator, OctaveTcpClient octaveTcpClient) {
-        this.engineSimulator = engineSimulator;
+    public EngWebSocketController(EngineSimulatorInterface engineSimulatorInterface, OctaveTcpClient octaveTcpClient, ECUSimulator ecuSimulator) {
+        this.engineSimulatorInterface = engineSimulatorInterface;
         this.octaveTcpClient = octaveTcpClient;
+        this.ecuSimulator = ecuSimulator;
     }
 
-    @MessageMapping("/start-engine")
-    public void startEngine( EngineStartRequest request) {
+    @MessageMapping("/startEngine")
+    public void startEngine(@Payload EngineStartRequest request) {
         System.out.println("Engine start triggered for Engine: " + request.getEngineId());
 
-        // Call method that starts engine
-        
-
+        ecuSimulator.startEngine();
     }
 
-    @MessageMapping("/connect-engine")
-    public void connectToOctaveEngine() {
-        System.out.println("Connecting to Octave Engine");
+    // @MessageMapping("/connect-engine")
+    // public void connectToOctaveEngine() {
+    //     System.out.println("Connecting to Octave Engine");
 
-        // Call method that connects to engine
-        octaveTcpClient.connectToEngine();
+    //     // Call method that connects to engine
+    //     octaveTcpClient.connectToEngine();
         
 
-    }
+    // }
 
     
 }

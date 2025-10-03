@@ -9,10 +9,10 @@ import org.springframework.stereotype.Service;
 import com.orbitron.dto.EngineDTO;
 
 @Service
-public class EngineSimulator {
+public class EngineSimulatorInterface {
     private final SimpMessagingTemplate messagingTemplate;
 
-    public EngineSimulator(SimpMessagingTemplate messagingTemplate) {
+    public EngineSimulatorInterface(SimpMessagingTemplate messagingTemplate) {
         this.messagingTemplate = messagingTemplate;
     }
 

@@ -30,4 +30,4 @@ services:
       dockerfile: Dockerfile.octave
     image: ams.vultrcr.com/orbitroncontainerregistry1/octave:latest
     ports:
-      - "5555:5555"
+      - "6000:6000"

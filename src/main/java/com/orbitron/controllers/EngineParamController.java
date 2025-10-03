@@ -18,7 +18,7 @@ import com.orbitron.dto.ThrottleMsgDTO;
 import com.orbitron.entities.entities.Engine;
 import com.orbitron.repositories.EngineRepository;
 import com.orbitron.services.ECUSimulator;
-import com.orbitron.services.EngineSimulator;
+import com.orbitron.services.EngineSimulatorInterface;
 import com.orbitron.services.OctaveTcpClient;
 
 @RestController
@@ -26,13 +26,13 @@ import com.orbitron.services.OctaveTcpClient;
 public class EngineParamController {
 
     private final EngineRepository engineRepository;
-    private final EngineSimulator engineSimulator;
+    private final EngineSimulatorInterface engineSimulator;
     private final ECUSimulator ecuSimulator;
     private final OctaveTcpClient octaveTcpClient;
 
     public EngineParamController
     (
-        EngineSimulator engineSimulator,
+        EngineSimulatorInterface engineSimulator,
         EngineRepository engineRepository, 
         ECUSimulator ecuSimulator,
         OctaveTcpClient octaveTcpClient
@@ -71,11 +71,18 @@ public class EngineParamController {
     // Connect to octave TCP server socket
     @PostMapping("/connectToEngine")
     public ResponseEntity<String> connectToEngineSim() {
-
-        octaveTcpClient.init();
+        try {
+            octaveTcpClient.init();
         
-        return ResponseEntity.ok("Connected to Engine simulator successfully!");
+            return ResponseEntity.ok("Connected to Engine simulator successfully!");
 
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                 .body("Failed to connect to Engine simulator!");
+
+        }
     }
 
     @MessageMapping("/throttle")
@@ -90,10 +97,9 @@ public class EngineParamController {
         ecuSimulator.update();
     }
 
-    @PostMapping("/sendCommandToEngine")
+    @PostMapping("/startEngine")
     public ResponseEntity<String> contactOctave() {
         // Send test data to octave
-        octaveTcpClient.sendCommandToOctaveEngine();
         return ResponseEntity.ok("Sent to octave");
     }
 
