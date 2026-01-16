@@ -1,12 +1,14 @@
-package com.example.airplane_route;
+package com.orbitron;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
-public class AirplaneRouteApplication {
+@EnableScheduling
+public class Orbitron {
 	public static void main(String[] args) {
-		SpringApplication.run(AirplaneRouteApplication.class, args);
+		SpringApplication.run(Orbitron.class, args);
 	}
 
 }
